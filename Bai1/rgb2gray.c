@@ -3,7 +3,7 @@
 #define WIDTH 256
 #define HEIGHT 256
 
-void readFile(const char *inputName, char red_matrix[], char green_matrix[], char blue_matrix[])
+void readFile(const char *inputName, unsigned char red_matrix[], unsigned char green_matrix[], unsigned char blue_matrix[])
 {
     FILE *fptr = fopen(inputName, "rb");
     fread(red_matrix, sizeof(char), WIDTH * HEIGHT, fptr);
@@ -12,7 +12,7 @@ void readFile(const char *inputName, char red_matrix[], char green_matrix[], cha
     fclose(fptr);
 }
 
-void Rgb2Gray(char gray_matrix[], char red_matrix[], char green_matrix[], char blue_matrix[])
+void Rgb2Gray(unsigned char gray_matrix[], unsigned char red_matrix[], unsigned char green_matrix[], unsigned char blue_matrix[])
 {
     // 0.299 ∙ Red + 0.587 ∙ Green + 0.114 ∙ Blue.
     int index;
@@ -26,7 +26,7 @@ void Rgb2Gray(char gray_matrix[], char red_matrix[], char green_matrix[], char b
     }
 }
 
-void writeFile(const char *outputName, char gray_matrix[])
+void writeFile(const char *outputName, unsigned char gray_matrix[])
 {
     FILE *fptr = fopen(outputName, "wb");
     fwrite(gray_matrix, sizeof(char), WIDTH * HEIGHT, fptr);
@@ -35,10 +35,10 @@ void writeFile(const char *outputName, char gray_matrix[])
 
 int main()
 {
-    char red_matrix[WIDTH * HEIGHT];
-    char green_matrix[WIDTH * HEIGHT];
-    char blue_matrix[WIDTH * HEIGHT];
-    char gray_matrix[WIDTH * HEIGHT];
+    unsigned char red_matrix[WIDTH * HEIGHT];
+    unsigned char green_matrix[WIDTH * HEIGHT];
+    unsigned char blue_matrix[WIDTH * HEIGHT];
+    unsigned char gray_matrix[WIDTH * HEIGHT];
     const char *inputName = "output/raw.dat";
     const char *outputName = "output/raw_gray.dat";
 

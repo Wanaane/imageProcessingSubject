@@ -3,16 +3,16 @@
 #define WIDTH 256
 #define HEIGHT 256
 
-void readFile(const char *inputName, char gray_matrix[])
+void readFile(const char *inputName, unsigned char gray_matrix[])
 {
     FILE *fptr = fopen(inputName, "rb");
     fread(gray_matrix, sizeof(char), WIDTH * HEIGHT, fptr);
     fclose(fptr);
 }
 
-void Gray2Bin(char bin_matrix[], char gray_matrix[])
+void Gray2Bin(unsigned char bin_matrix[], unsigned char gray_matrix[])
 {
-    unsigned char threshold = 127;
+    unsigned char threshold = 0x7F;
     unsigned char temp = 0x00;
     unsigned char countBit = 0;
     unsigned int index = 0;
@@ -39,7 +39,7 @@ void Gray2Bin(char bin_matrix[], char gray_matrix[])
     }
 }
 
-void writeFile(const char *outputName, char bin_matrix[])
+void writeFile(const char *outputName, unsigned char bin_matrix[])
 {
     FILE *fptr = fopen(outputName, "wb");
     fwrite(bin_matrix, sizeof(char), (WIDTH * HEIGHT) / 8, fptr);
@@ -48,8 +48,8 @@ void writeFile(const char *outputName, char bin_matrix[])
 
 int main()
 {
-    char gray_matrix[WIDTH * HEIGHT];
-    char bin_matrix[(WIDTH * HEIGHT) / 8];
+    unsigned char gray_matrix[WIDTH * HEIGHT];
+    unsigned char bin_matrix[(WIDTH * HEIGHT) / 8];
 
     const char *inputName = "output/raw_gray.dat";
     const char *outputName = "output/raw_bin.dat";
