@@ -12,69 +12,41 @@ void readFile(const char *inputName, unsigned char gray_matrix[])
     fclose(fptr);
 }
 
-void conv(unsigned char *in, unsigned char *out, int dataSizeX, int dataSizeY,
-          float *kernel, int kernelSizeX, int kernelSizeY)
+void conv(unsigned char in[], unsigned char out[], int width, int height,
+          float kernel[], int kernelSizeX, int kernelSizeY)
 {
-    int i, j, m, n;
-    unsigned char *inPtr, *inPtr2, *outPtr;
-    float *kPtr;
+    int i, j, m, n, mm, nn;
     int kCenterX, kCenterY;
-    int rowMin, rowMax; // to check boundary of input array
-    int colMin, colMax; //
-    float sum;          // temp accumulation buffer
-
+    int rowIndex, colIndex;
+    float sum;
+    int index = 0;
     // find center position of kernel (half of kernel size)
-    kCenterX = kernelSizeX >> 1;
-    kCenterY = kernelSizeY >> 1;
+    kCenterX = kernelSizeX / 2;
+    kCenterY = kernelSizeY / 2;
 
-    // init working  pointers
-    inPtr = inPtr2 = &in[dataSizeX * kCenterY + kCenterX]; // note that  it is shifted (kCenterX, kCenterY),
-    outPtr = out;
-    kPtr = kernel;
-
-    // start convolution
-    for (i = 0; i < dataSizeY; ++i) // number of rows
+    for (i = 0; i < height; ++i) // rows
     {
-        // compute the range of convolution, the current row of kernel should be between these
-        rowMax = i + kCenterY;
-        rowMin = i - dataSizeY + kCenterY;
-
-        for (j = 0; j < dataSizeX; ++j) // number of columns
+        for (j = 0; j < width; ++j) // columns
         {
-            // compute the range of convolution, the current column of kernel should be between these
-            colMax = j + kCenterX;
-            colMin = j - dataSizeX + kCenterX;
-
-            sum = 0; // set to 0 before accumulate
-
-            // flip the kernel and traverse all the kernel values
-            // multiply each kernel value with underlying input data
+            sum = 0;                          // init to 0 before sum
             for (m = 0; m < kernelSizeY; ++m) // kernel rows
             {
-                // check if the index is out of bound of input array
-                if (m <= rowMax && m > rowMin)
+                mm = kernelSizeY - 1 - m; // row index of flipped kernel
+
+                for (n = 0; n < kernelSizeX; ++n) // kernel columns
                 {
-                    for (n = 0; n < kernelSizeX; ++n)
-                    {
-                        // check the boundary of array
-                        if (n <= colMax && n > colMin)
-                            sum += *(inPtr - n) * *kPtr;
+                    nn = kernelSizeX - 1 - n; // column index of flipped kernel
 
-                        ++kPtr; // next kernel
-                    }
+                    // index of input signal, used for checking boundary
+                    rowIndex = i + m - kCenterY;
+                    colIndex = j + n - kCenterX;
+
+                    // ignore input samples which are out of bound
+                    if (rowIndex >= 0 && rowIndex < height && colIndex >= 0 && colIndex < width)
+                        sum += in[rowIndex * width + colIndex] * kernel[mm * kernelSizeX + nn];
                 }
-                else
-                    kPtr += kernelSizeX; // out of bound, move to next row of kernel
-
-                inPtr -= dataSizeX; // move input data 1 raw up
             }
-
-            // convert negative number to positive
-            *outPtr = (unsigned char)((float)fabs(sum) + 0.5f);
-
-            kPtr = kernel;    // reset kernel to (0,0)
-            inPtr = ++inPtr2; // next input
-            ++outPtr;         // next output
+            out[index++] = (unsigned char)fabs(sum);
         }
     }
 }
