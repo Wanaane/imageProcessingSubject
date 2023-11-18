@@ -3,3 +3,8 @@
 /data.txt
 tempCodeRunnerFile.*
 test.*
+*/tools
+
+```
+I have tried to add the following to the .gitignore file:
+```bash
