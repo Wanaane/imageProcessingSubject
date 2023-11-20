@@ -137,27 +137,39 @@ unsigned char findMedian(unsigned char in_FH[], unsigned char in_FP[], unsigned 
 
 void winnerTakeAll(unsigned char in_FH[], unsigned char in_FP[], unsigned char in_FV[], unsigned char in_FM[], unsigned char medianValue, int width, int height)
 {
-    unsigned char *maxPtr = NULL;
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
         {
-
-            maxPtr = &in_FH[i * height + j];
+            unsigned char *maxPtr = &in_FH[i * height + j];
             if (*maxPtr < in_FP[i * height + j])
             {
                 *maxPtr = 0;
                 maxPtr = &in_FP[i * height + j];
             }
+            else
+            {
+                in_FP[i * height + j] = 0;
+            }
+
             if (*maxPtr < in_FV[i * height + j])
             {
                 *maxPtr = 0;
                 maxPtr = &in_FV[i * height + j];
             }
+            else
+            {
+                in_FV[i * height + j] = 0;
+            }
+
             if (*maxPtr < in_FM[i * height + j])
             {
                 *maxPtr = 0;
                 maxPtr = &in_FM[i * height + j];
+            }
+            else
+            {
+                in_FM[i * height + j] = 0;
             }
 
             if (*maxPtr > medianValue)
@@ -199,124 +211,93 @@ void PPED(unsigned char in_FH[], unsigned char in_FP[], unsigned char in_FV[], u
     }
 }
 
-// Main Function
-int main()
+// Helper function to handel convolution between image input and kernel. Then calculate PPED vector
+void handlePPED(const char *inputPath, const char *outputPath, int PPED_vector[], int width, int height)
 {
-    // Declaration variable
-    // File name of input
-    const char *inputPerson_1 = "input/person1.dat";
-    const char *inputPerson_2 = "input/person2.dat";
-
-    // Input of person
-    unsigned char person_1[WIDTH * HEIGHT];
-    unsigned char person_2[WIDTH * HEIGHT];
-
-    // Convolve the output of the kernel with person_1
-    unsigned char person_1_FH[WIDTH * HEIGHT];
-    unsigned char person_1_FP[WIDTH * HEIGHT];
-    unsigned char person_1_FV[WIDTH * HEIGHT];
-    unsigned char person_1_FM[WIDTH * HEIGHT];
-
-    // Convolve the output of the kernel with person_2
-    unsigned char person_2_FH[WIDTH * HEIGHT];
-    unsigned char person_2_FP[WIDTH * HEIGHT];
-    unsigned char person_2_FV[WIDTH * HEIGHT];
-    unsigned char person_2_FM[WIDTH * HEIGHT];
-
-    // Binary matrix
-    unsigned char bin_FH[(WIDTH * HEIGHT) / 8];
-    unsigned char bin_FP[(WIDTH * HEIGHT) / 8];
-    unsigned char bin_FV[(WIDTH * HEIGHT) / 8];
-    unsigned char bin_FM[(WIDTH * HEIGHT) / 8];
-
     // Init kernel
     float K_H[] = {0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0}; // Horizontal
     float K_P[] = {0, 0, 0, 1, 0, 0, 1, 1, 0, -1, 0, 1, 0, -1, 0, 1, 0, -1, -1, 0, 0, -1, 0, 0, 0}; // 45 Degree
     float K_V[] = {0, 1, 0, -1, 0, 0, 1, 0, -1, 0, 0, 1, 0, -1, 0, 0, 1, 0, -1, 0, 0, 1, 0, -1, 0}; // Vertical
     float K_M[] = {0, -1, 0, 0, 0, 1, 0, -1, -1, 0, 0, 1, 0, -1, 0, 0, 1, 1, 0, -1, 0, 0, 0, 1, 0}; // -45 Degree
 
-    // Get input of person_1
-    readInput(inputPerson_1, person_1, WIDTH, HEIGHT);
+    // Input of person
+    unsigned char person[WIDTH * HEIGHT];
 
-    // Calculate convolutions for person_1
-    conv2D(person_1, person_1_FH, WIDTH, HEIGHT, K_H, KERNEL_X, KERNEL_Y);
-    conv2D(person_1, person_1_FP, WIDTH, HEIGHT, K_P, KERNEL_X, KERNEL_Y);
-    conv2D(person_1, person_1_FV, WIDTH, HEIGHT, K_V, KERNEL_X, KERNEL_Y);
-    conv2D(person_1, person_1_FM, WIDTH, HEIGHT, K_M, KERNEL_X, KERNEL_Y);
+    // Read input of person
+    readInput(inputPath, person, WIDTH, HEIGHT);
 
-    // Find median
-    unsigned char medianValue_1 = findMedian(person_1_FH, person_1_FP, person_1_FV, person_1_FM, WIDTH, HEIGHT);
-    printf("Median value of person 1: %d\n", medianValue_1);
+    // Convolve the output of the kernel with person
+    unsigned char person_FH[WIDTH * HEIGHT];
+    unsigned char person_FP[WIDTH * HEIGHT];
+    unsigned char person_FV[WIDTH * HEIGHT];
+    unsigned char person_FM[WIDTH * HEIGHT];
 
-    // Exprot binary image after edge detection
-    // and write to dat file
-    // Person 1
-
-    convertBinary(bin_FH, person_1_FH, medianValue_1, WIDTH, HEIGHT);
-    convertBinary(bin_FP, person_1_FP, medianValue_1, WIDTH, HEIGHT);
-    convertBinary(bin_FV, person_1_FV, medianValue_1, WIDTH, HEIGHT);
-    convertBinary(bin_FM, person_1_FM, medianValue_1, WIDTH, HEIGHT);
-
-    // Write binary file
-    writeFileBin("output/person1/bin_FH.dat", bin_FH, WIDTH, HEIGHT);
-    writeFileBin("output/person1/bin_FP.dat", bin_FP, WIDTH, HEIGHT);
-    writeFileBin("output/person1/bin_FV.dat", bin_FV, WIDTH, HEIGHT);
-    writeFileBin("output/person1/bin_FM.dat", bin_FM, WIDTH, HEIGHT);
-
-    // Get input of person_1
-    readInput(inputPerson_2, person_2, WIDTH, HEIGHT);
-
-    // Calculate convolutions for person_1
-    conv2D(person_2, person_2_FH, WIDTH, HEIGHT, K_H, KERNEL_X, KERNEL_Y);
-    conv2D(person_2, person_2_FP, WIDTH, HEIGHT, K_P, KERNEL_X, KERNEL_Y);
-    conv2D(person_2, person_2_FV, WIDTH, HEIGHT, K_V, KERNEL_X, KERNEL_Y);
-    conv2D(person_2, person_2_FM, WIDTH, HEIGHT, K_M, KERNEL_X, KERNEL_Y);
+    // Calculate convolutions for person
+    conv2D(person, person_FH, WIDTH, HEIGHT, K_H, KERNEL_X, KERNEL_Y);
+    conv2D(person, person_FP, WIDTH, HEIGHT, K_P, KERNEL_X, KERNEL_Y);
+    conv2D(person, person_FV, WIDTH, HEIGHT, K_V, KERNEL_X, KERNEL_Y);
+    conv2D(person, person_FM, WIDTH, HEIGHT, K_M, KERNEL_X, KERNEL_Y);
 
     // Find median
-    unsigned char medianValue_2 = findMedian(person_2_FH, person_2_FP, person_2_FV, person_2_FM, WIDTH, HEIGHT);
-    printf("Median value of person 2: %d\n", medianValue_1);
+    unsigned char medianValue = findMedian(person_FH, person_FP, person_FV, person_FM, WIDTH, HEIGHT);
 
-    // Exprot binary image after edge detection
-    // and write to dat file
-    // Person 2
+    // Init Binary matrix
+    unsigned char bin_FH[(WIDTH * HEIGHT) / 8];
+    unsigned char bin_FP[(WIDTH * HEIGHT) / 8];
+    unsigned char bin_FV[(WIDTH * HEIGHT) / 8];
+    unsigned char bin_FM[(WIDTH * HEIGHT) / 8];
 
-    convertBinary(bin_FH, person_2_FH, medianValue_1, WIDTH, HEIGHT);
-    convertBinary(bin_FP, person_2_FP, medianValue_1, WIDTH, HEIGHT);
-    convertBinary(bin_FV, person_2_FV, medianValue_1, WIDTH, HEIGHT);
-    convertBinary(bin_FM, person_2_FM, medianValue_1, WIDTH, HEIGHT);
+    // Convert to binary matrix
+    convertBinary(bin_FH, person_FH, medianValue, WIDTH, HEIGHT);
+    convertBinary(bin_FP, person_FP, medianValue, WIDTH, HEIGHT);
+    convertBinary(bin_FV, person_FV, medianValue, WIDTH, HEIGHT);
+    convertBinary(bin_FM, person_FM, medianValue, WIDTH, HEIGHT);
 
     // Write binary file
-    writeFileBin("output/person2/bin_FH.dat", bin_FH, WIDTH, HEIGHT);
-    writeFileBin("output/person2/bin_FP.dat", bin_FP, WIDTH, HEIGHT);
-    writeFileBin("output/person2/bin_FV.dat", bin_FV, WIDTH, HEIGHT);
-    writeFileBin("output/person2/bin_FM.dat", bin_FM, WIDTH, HEIGHT);
+    char outputNameFH[30];
+    char outputNameFP[30];
+    char outputNameFV[30];
+    char outputNameFM[30];
+
+    snprintf(outputNameFH, sizeof(outputNameFH), "%s/%s", outputPath, "bin_FH.dat");
+    snprintf(outputNameFP, sizeof(outputNameFP), "%s/%s", outputPath, "bin_FP.dat");
+    snprintf(outputNameFV, sizeof(outputNameFV), "%s/%s", outputPath, "bin_FV.dat");
+    snprintf(outputNameFM, sizeof(outputNameFM), "%s/%s", outputPath, "bin_FM.dat");
+
+    writeFileBin(outputNameFH, bin_FH, WIDTH, HEIGHT);
+    writeFileBin(outputNameFP, bin_FP, WIDTH, HEIGHT);
+    writeFileBin(outputNameFV, bin_FV, WIDTH, HEIGHT);
+    writeFileBin(outputNameFM, bin_FM, WIDTH, HEIGHT);
 
     // Winner take all
-    winnerTakeAll(person_1_FH, person_1_FP, person_1_FV, person_1_FM, medianValue_1, WIDTH, HEIGHT);
-    winnerTakeAll(person_2_FH, person_2_FP, person_2_FV, person_2_FM, medianValue_2, WIDTH, HEIGHT);
+    winnerTakeAll(person_FH, person_FP, person_FV, person_FM, medianValue, WIDTH, HEIGHT);
 
     // Calculate Projected Principal Edge Direction (PPED) vector
+    PPED(person_FH, person_FP, person_FV, person_FM, PPED_vector, WIDTH, HEIGHT);
+
+    // Print PPED vector
+    printf("PPED vector:\n");
+    printf("[");
+    for (int i = 0; i < 64; i++)
+    {
+        printf("%d ", PPED_vector[i]);
+    }
+    printf("]\n\n\n");
+}
+// Main Function
+int main()
+{
+    // File name of input
+    const char *inputPerson_1 = "input/person1.dat";
+    const char *inputPerson_2 = "input/person2.dat";
+
+    // Init Projected Principal Edge Direction (PPED) vector
     int PPED_vector_1[4 * 16];
     int PPED_vector_2[4 * 16];
 
-    PPED(person_1_FH, person_1_FP, person_1_FV, person_1_FM, PPED_vector_1, WIDTH, HEIGHT);
-    PPED(person_2_FH, person_2_FP, person_2_FV, person_2_FM, PPED_vector_2, WIDTH, HEIGHT);
+    // Handle input person 1
+    handlePPED(inputPerson_1, "output/person1", PPED_vector_1, WIDTH, HEIGHT);
+    handlePPED(inputPerson_2, "output/person2", PPED_vector_2, WIDTH, HEIGHT);
 
-    // Print PPED vector
-    printf("PPED vector of person 1:\n");
-    printf("[");
-    for (int i = 0; i < 64; i++)
-    {
-        printf("%d ", PPED_vector_1[i]);
-    }
-    printf("]\n\n\n");
-
-    printf("PPED vector of person 2:\n");
-    printf("[");
-    for (int i = 0; i < 64; i++)
-    {
-        printf("%d ", PPED_vector_2[i]);
-    }
-    printf("]\n\n\n");
     return 0;
 }
