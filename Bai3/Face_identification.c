@@ -284,20 +284,46 @@ void handlePPED(const char *inputPath, const char *outputPath, int PPED_vector[]
     }
     printf("]\n\n\n");
 }
+
+float distance(int PPED_vector_1[], int PPED_vector_2[])
+{
+    float sum = 0;
+    for (int i = 0; i < 64; i++)
+    {
+        sum += pow(PPED_vector_1[i] - PPED_vector_2[i], 2);
+    }
+    return sqrt(sum);
+}
+
 // Main Function
 int main()
 {
     // File name of input
     const char *inputPerson_1 = "input/person1.dat";
     const char *inputPerson_2 = "input/person2.dat";
+    const char *input = "input/who.dat";
 
     // Init Projected Principal Edge Direction (PPED) vector
     int PPED_vector_1[4 * 16];
     int PPED_vector_2[4 * 16];
 
+    int whose_PPED_vector[4 * 16];
+
     // Handle input person 1
     handlePPED(inputPerson_1, "output/person1", PPED_vector_1, WIDTH, HEIGHT);
     handlePPED(inputPerson_2, "output/person2", PPED_vector_2, WIDTH, HEIGHT);
+    handlePPED(input, "output/who", whose_PPED_vector, WIDTH, HEIGHT);
+
+    float d1 = distance(PPED_vector_1, whose_PPED_vector);
+    float d2 = distance(PPED_vector_2, whose_PPED_vector);
+
+    printf("Distance between person 1 and who: %f\n", d1);
+    printf("Distance between person 2 and who: %f\n", d2);
+
+    if (d1 < d2)
+        printf("That is Person 1\n");
+    else
+        printf("That is Person 2\n");
 
     return 0;
 }
