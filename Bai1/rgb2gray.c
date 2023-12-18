@@ -20,7 +20,7 @@ void Rgb2Gray(unsigned char gray_matrix[], unsigned char red_matrix[], unsigned 
     {
         for (int y = 0; y < WIDTH; y++)
         {
-            index = x * HEIGHT + y;
+            index = x * WIDTH + y;
             gray_matrix[index] = 0.299 * red_matrix[index] + 0.587 * green_matrix[index] + 0.114 * blue_matrix[index];
         }
     }

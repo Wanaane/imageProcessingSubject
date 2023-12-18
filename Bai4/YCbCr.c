@@ -160,7 +160,7 @@ void sampling(YCbCr *inYCbCrImage, YCbCr *outYCbCrImage, SAMPLING_FORMAT typeSam
     {
         for (uint32_t j = 0; j < width; j += 2)
         {
-            inIndex = i * height + j;
+            inIndex = i * width + j;
             *(outYCbCrImage->Cb + outIndex) = *(inYCbCrImage->Cb + inIndex);
             *(outYCbCrImage->Cr + outIndex) = *(inYCbCrImage->Cr + inIndex);
             outIndex++;
@@ -184,7 +184,7 @@ void recoverSampling(YCbCr *encodedImage, YCbCr *recoveredImage)
     {
         for (uint32_t j = 0; j < width; j += 2)
         {
-            inIndex = i * height + j;
+            inIndex = i * width + j;
             *(recoveredImage->Cb + inIndex) = *(encodedImage->Cb + outIndex);
             *(recoveredImage->Cr + inIndex) = *(encodedImage->Cr + outIndex);
             outIndex++;
@@ -201,7 +201,7 @@ void recoverSampling(YCbCr *encodedImage, YCbCr *recoveredImage)
         {
             for (uint32_t j = 0; j < width; j += 2)
             {
-                index = i * height + j;
+                index = i * width + j;
                 preRowIndex = (i - 1) * height + j;
                 *(recoveredImage->Cb + index) = *(recoveredImage->Cb + preRowIndex);
                 *(recoveredImage->Cr + index) = *(recoveredImage->Cr + preRowIndex);
@@ -215,7 +215,7 @@ void recoverSampling(YCbCr *encodedImage, YCbCr *recoveredImage)
     {
         for (uint32_t j = 1; j < width; j += 2)
         {
-            index = i * height + j;
+            index = i * width + j;
             preColIndex = index - 1;
             *(recoveredImage->Cb + index) = *(recoveredImage->Cb + preColIndex);
             *(recoveredImage->Cr + index) = *(recoveredImage->Cr + preColIndex);

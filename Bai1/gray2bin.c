@@ -28,7 +28,7 @@ void Gray2Bin(unsigned char bin_matrix[], unsigned char gray_matrix[])
             }
             temp <<= 1;
             countBit++;
-            if (gray_matrix[x * HEIGHT + y] > threshold)
+            if (gray_matrix[x * WIDTH + y] > threshold)
             {
                 temp |= 0x01;
             }

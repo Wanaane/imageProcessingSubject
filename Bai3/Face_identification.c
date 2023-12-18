@@ -33,7 +33,7 @@ void convertBinary(unsigned char bin_matrix[], unsigned char gray_matrix[], unsi
             }
             temp <<= 1;
             countBit++;
-            if (gray_matrix[x * HEIGHT + y] > threshold)
+            if (gray_matrix[x * WIDTH + y] > threshold)
             {
                 temp |= 0x01;
             }
@@ -100,19 +100,19 @@ unsigned char findMedian(unsigned char in_FH[], unsigned char in_FP[], unsigned 
     {
         for (int j = 0; j < width; j++)
         {
-            index = in_FH[i * height + j];
+            index = in_FH[i * width + j];
             if (valueBuffer[index] == 0)
                 valueBuffer[index] = 1;
 
-            index = in_FP[i * height + j];
+            index = in_FP[i * width + j];
             if (valueBuffer[index] == 0)
                 valueBuffer[index] = 1;
 
-            index = in_FV[i * height + j];
+            index = in_FV[i * width + j];
             if (valueBuffer[index] == 0)
                 valueBuffer[index] = 1;
 
-            index = in_FM[i * height + j];
+            index = in_FM[i * width + j];
             if (valueBuffer[index] == 0)
                 valueBuffer[index] = 1;
         }
@@ -141,35 +141,35 @@ void winnerTakeAll(unsigned char in_FH[], unsigned char in_FP[], unsigned char i
     {
         for (int j = 0; j < width; j++)
         {
-            unsigned char *maxPtr = &in_FH[i * height + j];
-            if (*maxPtr < in_FP[i * height + j])
+            unsigned char *maxPtr = &in_FH[i * width + j];
+            if (*maxPtr < in_FP[i * width + j])
             {
                 *maxPtr = 0;
-                maxPtr = &in_FP[i * height + j];
+                maxPtr = &in_FP[i * width + j];
             }
             else
             {
-                in_FP[i * height + j] = 0;
+                in_FP[i * width + j] = 0;
             }
 
-            if (*maxPtr < in_FV[i * height + j])
+            if (*maxPtr < in_FV[i * width + j])
             {
                 *maxPtr = 0;
-                maxPtr = &in_FV[i * height + j];
+                maxPtr = &in_FV[i * width + j];
             }
             else
             {
-                in_FV[i * height + j] = 0;
+                in_FV[i * width + j] = 0;
             }
 
-            if (*maxPtr < in_FM[i * height + j])
+            if (*maxPtr < in_FM[i * width + j])
             {
                 *maxPtr = 0;
-                maxPtr = &in_FM[i * height + j];
+                maxPtr = &in_FM[i * width + j];
             }
             else
             {
-                in_FM[i * height + j] = 0;
+                in_FM[i * width + j] = 0;
             }
 
             if (*maxPtr > medianValue)
@@ -197,10 +197,10 @@ void PPED(unsigned char in_FH[], unsigned char in_FP[], unsigned char in_FV[], u
             {
                 for (int n = j * sizeBlockX; n < (j + 1) * sizeBlockX; n++)
                 {
-                    v1 += in_FH[m * height + n];
-                    v2 += in_FP[m * height + n];
-                    v3 += in_FV[m * height + n];
-                    v4 += in_FM[m * height + n];
+                    v1 += in_FH[m * width + n];
+                    v2 += in_FP[m * width + n];
+                    v3 += in_FV[m * width + n];
+                    v4 += in_FM[m * width + n];
                 }
             }
             PPED_vector[i * 4 + j] = v1;
